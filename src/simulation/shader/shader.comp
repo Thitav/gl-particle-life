@@ -1,0 +1,42 @@
+#version 450 core
+
+layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+uniform float deltaTime;
+
+struct Particle {
+    uint type;
+    vec2 position;
+    vec2 velocity;
+};
+layout(std430, binding = 0) buffer particlesBuff {
+    Particle particles[];
+};
+
+// layout(std430, binding = 1) buffer rules {
+//     float rules[][];
+// }
+
+void main() {
+  Particle self = particles[gl_GlobalInvocationID.x];
+  vec2 acc = vec2(0.0, 0.0);
+
+  uint particleCount = gl_NumWorkGroups.x * gl_WorkGroupSize.x;
+  for (uint i = 0; i < particleCount; i++) {
+    if (i == gl_GlobalInvocationID.x) {
+       continue;
+    }
+
+    Particle p = particles[i];
+    
+    vec2 diff = self.position - p.position;
+    float mag = length(diff);
+    if (mag < 0.0001) {
+      continue;
+    }
+    acc += normalize(diff) * 0.0001 / (mag * mag);
+  }
+  self.velocity += acc * deltaTime;
+
+  particles[gl_GlobalInvocationID.x] = self;
+}
