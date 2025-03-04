@@ -3,7 +3,7 @@
 
 char *_shader_read(const char *path)
 {
-  FILE *fptr = fopen(path, "r");
+  FILE *fptr = fopen(path, "rb");
   if (fptr == NULL)
   {
     fprintf(stderr, "[ERROR][SHADER] Failed to open file %s\n", path);

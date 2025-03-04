@@ -5,17 +5,13 @@ layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 uniform float deltaTime;
 
 struct Particle {
-    uint type;
     vec2 position;
     vec2 velocity;
+    uint type;
 };
 layout(std430, binding = 0) buffer particlesBuff {
     Particle particles[];
 };
-
-// layout(std430, binding = 1) buffer rules {
-//     float rules[][];
-// }
 
 void main() {
   Particle self = particles[gl_GlobalInvocationID.x];

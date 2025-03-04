@@ -4,8 +4,8 @@
 #include "gl/glh.h"
 #include "simulation/simulation.h"
 
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
 // Window resize callback function
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -23,7 +23,7 @@ int main()
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-  GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Test", NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Test", NULL, NULL);
   if (window == NULL)
   {
     fprintf(stderr, "[ERROR] Failed to create GLFW window\n");
@@ -42,11 +42,11 @@ int main()
 
   printf("Loaded OpenGL %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
 
-  glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+  glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   Simulation simulation;
-  simulation_init(&simulation, 1, 64, 1, (uint16_t[]){64});
+  simulation_init(&simulation, 1, 64, 2, (uint16_t[]){32, 32});
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glPointSize(2.0f);

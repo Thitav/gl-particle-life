@@ -9,13 +9,14 @@ typedef struct
 {
   float x;
   float y;
-} __declspec(align(8)) GLVec2;
+} GLVec2;
 
 typedef struct
 {
-  GLuint type;
   GLVec2 position;
   GLVec2 velocity;
+  GLuint type;
+  GLfloat _pad;
 } Particle;
 
 typedef struct

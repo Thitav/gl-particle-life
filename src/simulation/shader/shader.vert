@@ -1,9 +1,9 @@
 #version 450 core
 
 struct Particle {
-    uint type;
     vec2 position;
     vec2 velocity;
+    uint type;
 };
 layout(std430, binding = 0) buffer particlesBuff {
     Particle particles[];

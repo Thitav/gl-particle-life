@@ -21,12 +21,15 @@ void simulation_init(Simulation *simulation, unsigned int seed, uint16_t size, u
   }
   srand(seed);
 
+  uint16_t counter = 0;
   for (uint8_t i = 0; i < groups_count; i++)
   {
     for (uint16_t j = 0; j < groups_sizes[i]; j++)
     {
-      simulation->particles[j].type = i;
-      simulation->particles[j].position = (GLVec2){(float)rand() / RAND_MAX, (float)rand() / RAND_MAX};
+      simulation->particles[counter].type = i;
+      simulation->particles[counter].position = (GLVec2){(float)rand() * 2.0f / RAND_MAX - 1.0f, (float)rand() * 2.0f / RAND_MAX - 1.0f};
+      // simulation->particles[counter].position = (GLVec2){0.2f, 0.2f};
+      counter++;
     }
   }
 
@@ -41,7 +44,7 @@ void simulation_init(Simulation *simulation, unsigned int seed, uint16_t size, u
 
   Shader compute_shader;
   shader_init(&compute_shader, GL_COMPUTE_SHADER);
-  shader_compile(&compute_shader, "./src/simulation/shader/shader.comp");
+  shader_compile(&compute_shader, "C:\\Users\\thitav\\Documents\\gl-particle-life\\src\\simulation\\shader\\shader.comp");
 
   ShaderProgram compute_program;
   shader_program_init(&compute_program);
@@ -52,9 +55,9 @@ void simulation_init(Simulation *simulation, unsigned int seed, uint16_t size, u
 
   Shader vert_shader, frag_shader;
   shader_init(&vert_shader, GL_VERTEX_SHADER);
-  shader_compile(&vert_shader, "./src/simulation/shader/shader.vert");
+  shader_compile(&vert_shader, "C:\\Users\\thitav\\Documents\\gl-particle-life\\src\\simulation\\shader\\shader.vert");
   shader_init(&frag_shader, GL_FRAGMENT_SHADER);
-  shader_compile(&frag_shader, "./src/simulation/shader/shader.frag");
+  shader_compile(&frag_shader, "C:\\Users\\thitav\\Documents\\gl-particle-life\\src\\simulation\\shader\\shader.frag");
 
   ShaderProgram render_program;
   shader_program_init(&render_program);
