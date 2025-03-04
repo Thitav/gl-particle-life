@@ -46,7 +46,8 @@ int main()
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   Simulation simulation;
-  simulation_init(&simulation, 1, 64, 2, (uint16_t[]){32, 32});
+  simulation_init(&simulation, 1, 64, 2, (uint16_t[]){32, 32}, (float[]){0.0f, 0.2f, 0.0f, 0.0f},
+                  (GLSL_Vec4[]){{1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}});
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glPointSize(2.0f);

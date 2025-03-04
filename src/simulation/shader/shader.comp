@@ -2,35 +2,45 @@
 
 layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
+struct Particle {
+  vec2 position;
+  vec2 velocity;
+  uint type;
+};
+layout (std430, binding = 0) buffer particlesSSBO {
+  Particle particles[];
+};
+
 uniform float deltaTime;
 
-struct Particle {
-    vec2 position;
-    vec2 velocity;
-    uint type;
-};
-layout(std430, binding = 0) buffer particlesBuff {
-    Particle particles[];
+layout (std140, binding = 1) uniform simulationUBO {
+  uint particlesCount;
+  uint groupsCount;
+  vec4 groupsColors[8];
+  vec4 groupsRules[64];
 };
 
 void main() {
   Particle self = particles[gl_GlobalInvocationID.x];
   vec2 acc = vec2(0.0, 0.0);
 
-  uint particleCount = gl_NumWorkGroups.x * gl_WorkGroupSize.x;
-  for (uint i = 0; i < particleCount; i++) {
+  // uint particleCount = gl_NumWorkGroups.x * gl_WorkGroupSize.x;
+  for (uint i = 0; i < particlesCount; i++) {
     if (i == gl_GlobalInvocationID.x) {
-       continue;
+      continue;
     }
 
     Particle p = particles[i];
-    
+
     vec2 diff = self.position - p.position;
     float mag = length(diff);
     if (mag < 0.0001) {
       continue;
     }
-    acc += normalize(diff) * 0.0001 / (mag * mag);
+
+    uint index = self.type * groupsCount + p.type;
+    float rule = groupsRules[index / 4][index % 4];
+    acc += normalize(diff) * 0.0001 * rule / (mag * mag);
   }
   self.velocity += acc * deltaTime;
 

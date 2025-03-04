@@ -1,19 +1,21 @@
 #include "simulation.h"
-#include "../gl/glh.h"
-#include "../gl/shader.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include "../gl/glh.h"
+#include "../gl/shader.h"
 
 #define WORK_GROUP_SIZE 64
 
-void simulation_init(Simulation *simulation, unsigned int seed, uint16_t size, uint8_t groups_count, uint16_t groups_sizes[])
+void simulation_init(Simulation *simulation, unsigned int seed, uint16_t particles_count, uint8_t groups_count,
+                     uint16_t groups_sizes[], float groups_rules[], GLSL_Vec4 groups_colors[])
 {
-  simulation->size = size;
+  simulation->particles_count = particles_count;
   simulation->last_time = 0.0f;
   // simulation->groups_count = groups_count;
   // simulation->groups_sizes = groups_sizes;
-  simulation->particles = calloc(size, sizeof(Particle));
+  simulation->particles = calloc(particles_count, sizeof(GLSL_Particle));
 
   if (seed == 0)
   {
@@ -27,24 +29,45 @@ void simulation_init(Simulation *simulation, unsigned int seed, uint16_t size, u
     for (uint16_t j = 0; j < groups_sizes[i]; j++)
     {
       simulation->particles[counter].type = i;
-      simulation->particles[counter].position = (GLVec2){(float)rand() * 2.0f / RAND_MAX - 1.0f, (float)rand() * 2.0f / RAND_MAX - 1.0f};
-      // simulation->particles[counter].position = (GLVec2){0.2f, 0.2f};
+      simulation->particles[counter].position = (GLSL_Vec2){
+        (float) rand() * 2.0f / RAND_MAX - 1.0f, (float) rand() * 2.0f / RAND_MAX - 1.0f
+      };
+      // simulation->particles[counter].position = (GLSL_Vec2){0.2f, 0.2f};
       counter++;
     }
   }
+
+  GLSL_SimulationData simulation_data = {.particles_count = particles_count, .groups_count = groups_count};
+  for (uint16_t i = 0; i < groups_count * groups_count; i += 4)
+  {
+    simulation_data.groups_rules[i] = (GLSL_Vec4){
+      groups_rules[i], groups_rules[i + 1], groups_rules[i + 2], groups_rules[i + 3]
+    };
+  }
+  memcpy(simulation_data.groups_colors, groups_colors, groups_count * sizeof(GLSL_Vec4));
+
+  // simulation_data.groups_rules[8] = 1.0f;
 
   GLuint vao;
   glCreateVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
-  GLuint particles_buffer;
-  glCreateBuffers(1, &particles_buffer);
-  glNamedBufferData(particles_buffer, size * sizeof(Particle), simulation->particles, GL_STATIC_DRAW);
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, particles_buffer);
+  GLuint simulation_ubo;
+  glCreateBuffers(1, &simulation_ubo);
+  glBindBuffer(GL_UNIFORM_BUFFER, simulation_ubo);
+  glBufferData(GL_UNIFORM_BUFFER, sizeof(GLSL_SimulationData), &simulation_data, GL_STATIC_DRAW);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 1, simulation_ubo);
+
+  GLuint particles_ssbo;
+  glCreateBuffers(1, &particles_ssbo);
+  glNamedBufferData(particles_ssbo, (GLsizeiptr) (particles_count * sizeof(GLSL_Particle)), simulation->particles,
+                    GL_STATIC_DRAW);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, particles_ssbo);
 
   Shader compute_shader;
   shader_init(&compute_shader, GL_COMPUTE_SHADER);
-  shader_compile(&compute_shader, "C:\\Users\\thitav\\Documents\\gl-particle-life\\src\\simulation\\shader\\shader.comp");
+  shader_compile(&compute_shader,
+                 "C:\\Users\\thitav\\Documents\\gl-particle-life\\src\\simulation\\shader\\shader.comp");
 
   ShaderProgram compute_program;
   shader_program_init(&compute_program);
@@ -85,15 +108,15 @@ void simulation_update(Simulation *simulation)
 
   shader_program_bind(&simulation->compute_program);
   glUniform1f(glGetUniformLocation(simulation->compute_program.handle, "deltaTime"), delta_time);
-  glDispatchCompute(simulation->size / WORK_GROUP_SIZE, 1, 1);
+  glDispatchCompute(simulation->particles_count / WORK_GROUP_SIZE, 1, 1);
   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
   shader_program_bind(&simulation->render_program);
-  glDrawArraysInstanced(GL_POINTS, 0, 1, simulation->size);
+  glDrawArraysInstanced(GL_POINTS, 0, 1, simulation->particles_count);
 }
 
 void simulation_destroy(Simulation *simulation)
 {
   free(simulation->particles);
-  simulation->size = 0;
+  simulation->particles_count = 0;
 }
