@@ -10,15 +10,14 @@ layout (std430, binding = 0) buffer particlesSSBO {
 };
 
 layout (std140, binding = 1) uniform simulationUBO {
+  vec4 groupsRules[16];
+  vec4 groupsColors[8];
   uint particlesCount;
   uint groupsCount;
-  vec4 groupsColors[8];
-  vec4 groupsRules[64];
 };
 
 out vec4 particleColor;
-out gl_PerVertex
-{
+out gl_PerVertex {
   vec4 gl_Position;
   float gl_PointSize;
   float gl_ClipDistance[];
