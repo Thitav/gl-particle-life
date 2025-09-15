@@ -1,0 +1,12 @@
+#ifndef SIMULATION_ERROR_H
+#define SIMULATION_ERROR_H
+
+typedef enum
+{
+  E_SIM_SUCCESS,
+  E_SIM_ALLOC,
+  E_SIM_GROUPS_SEALED,
+  E_SIM_GROUP_RULES_INVALID_COUNT,
+} SimulationError;
+
+#endif

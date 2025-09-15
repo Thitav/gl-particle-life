@@ -1,5 +1,5 @@
-#ifndef SHADER_H
-#define SHADER_H
+#ifndef GL_SHADER_H
+#define GL_SHADER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,27 +9,27 @@
 typedef struct
 {
   GLuint handle;
-} Shader;
+} GlShader;
 
 typedef struct
 {
   GLuint handle;
-} ShaderProgram;
+} GlShaderProgram;
 
-int shader_init(Shader *shader, GLenum type);
+int gl_shader_init(GlShader *shader, GLenum type);
 
-int shader_compile(const Shader *shader, const char *path);
+int gl_shader_compile(const GlShader *shader, const char *path);
 
-void shader_destroy(const Shader *shader);
+void gl_shader_destroy(const GlShader *shader);
 
-int shader_program_init(ShaderProgram *shader_program);
+int gl_shader_program_init(GlShaderProgram *shader_program);
 
-void shader_program_attach(const ShaderProgram *shader_program, const Shader *shader);
+void gl_shader_program_attach(const GlShaderProgram *shader_program, const GlShader *shader);
 
-void shader_program_bind(const ShaderProgram *shader_program);
+void gl_shader_program_bind(const GlShaderProgram *shader_program);
 
-int shader_program_link(const ShaderProgram *shader_program);
+int gl_shader_program_link(const GlShaderProgram *shader_program);
 
-void shader_program_destroy(ShaderProgram *shader_program);
+void gl_shader_program_destroy(GlShaderProgram *shader_program);
 
 #endif

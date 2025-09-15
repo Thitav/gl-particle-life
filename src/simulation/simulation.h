@@ -1,23 +1,10 @@
-#ifndef SIMULATION_H
-#define SIMULATION_H
+#ifndef SIMULATION_SIMULATION_H
+#define SIMULATION_SIMULATION_H
 
-#include <gl/glh.h>
+#include <gl/types.h>
 #include <gl/shader.h>
 #include <stdint.h>
-
-typedef struct
-{
-  GLfloat x;
-  GLfloat y;
-} GLS_Vec2;
-
-typedef struct
-{
-  GLfloat x;
-  GLfloat y;
-  GLfloat z;
-  GLfloat w;
-} GLS_Vec4;
+#include "group.h"
 
 typedef struct
 {
@@ -33,31 +20,32 @@ typedef struct
   GLS_Vec4 groups_colors[8];
   GLuint particles_count;
   GLuint groups_count;
+  GLfloat viscosity;
 } GLS_SimulationData;
 
 typedef struct
 {
-  ShaderProgram compute_program;
-  ShaderProgram render_program;
-} SimulationShaders;
-
-typedef struct
-{
-  SimulationShaders shaders;
-  uint16_t particles_count;
-  // uint8_t groups_count;
-  // uint16_t *groups_sizes;
-  ShaderProgram compute_program;
-  ShaderProgram render_program;
+  GlShaderProgram compute_program;
+  GlShaderProgram render_program;
   GLuint vao;
   GLuint particles_ssbo;
   GLuint simulation_ubo;
+  GLS_SimulationData simulation_data;
   GLS_Particle *particles;
+} SimulationGlData;
+
+typedef struct
+{
+  SimulationGlData gl_data;
+  SimulationGroups groups;
   float last_time;
+  unsigned int seed;
 } Simulation;
 
-void simulation_init(Simulation *simulation, unsigned int seed, uint16_t particles_count, uint8_t groups_count,
-                     uint16_t groups_sizes[], float groups_rules[], GLS_Vec4 groups_colors[]);
+void simulation_init(Simulation *simulation, SimulationGroups groups, float viscosity,
+                     unsigned int seed);
+
+SimulationError simulation_start(Simulation *simulation);
 
 void simulation_update(Simulation *simulation);
 

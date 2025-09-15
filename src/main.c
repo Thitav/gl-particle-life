@@ -4,8 +4,8 @@
 #include "gl/glh.h"
 #include "simulation/simulation.h"
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
 
 // Window resize callback function
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -45,9 +45,20 @@ int main()
   glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+  SimulationGroups groups;
+  simulation_groups_init(&groups);
+  simulation_groups_add_group(&groups, 500);
+  simulation_groups_add_group(&groups, 500);
+  simulation_groups_add_group(&groups, 500);
+  simulation_groups_add_group(&groups, 500);
+  simulation_groups_add_rules(&groups, 0, 4, (float[]){0.9f, -0.8f, 0.3f, 0.06f});
+  simulation_groups_add_rules(&groups, 1, 4, (float[]){-0.4f, 0.5f, 0.2f, 0.6f});
+  simulation_groups_add_rules(&groups, 2, 4, (float[]){-0.8f, 0.2f, -0.02f, -0.7f});
+  simulation_groups_add_rules(&groups, 3, 4, (float[]){0.5f, 0.9f, -0.3f, 0.4f});
+
   Simulation simulation;
-  simulation_init(&simulation, 1, 64, 2, (uint16_t[]){32, 32}, (float[]){0.2f, 0.2f, 0.2f, 0.2f},
-                  (GLS_Vec4[]){{1.0f, 0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}});
+  simulation_init(&simulation, groups, 0.5f, 42);
+  simulation_start(&simulation);
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glPointSize(2.0f);

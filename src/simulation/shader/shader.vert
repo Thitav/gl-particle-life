@@ -35,6 +35,6 @@ void main() {
   self.position += self.velocity;
 
   particles[gl_InstanceID] = self;
-  particleColor = groupsColors[self.type];
+  particleColor = vec4(1.0f, 0.0f, 0.0f, 0.0f); // groupsColors[self.type];
   gl_Position = vec4(self.position, 1.0, 1.0);
 }

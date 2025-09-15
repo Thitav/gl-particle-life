@@ -1,7 +1,7 @@
 #include "shader.h"
 #include <stdio.h>
 
-int shader_init(Shader *shader, GLenum type)
+int gl_shader_init(GlShader *shader, GLenum type)
 {
   shader->handle = glCreateShader(type);
 
@@ -14,7 +14,7 @@ int shader_init(Shader *shader, GLenum type)
   return 0;
 }
 
-int shader_compile(const Shader *shader, const char *path)
+int gl_shader_compile(const GlShader *shader, const char *path)
 {
   FILE *fptr = fopen(path, "rb");
   if (fptr == NULL)
@@ -75,12 +75,12 @@ int shader_compile(const Shader *shader, const char *path)
   return 0;
 }
 
-void shader_destroy(const Shader *shader)
+void gl_shader_destroy(const GlShader *shader)
 {
   glDeleteShader(shader->handle);
 }
 
-int shader_program_init(ShaderProgram *shader_program)
+int gl_shader_program_init(GlShaderProgram *shader_program)
 {
   shader_program->handle = glCreateProgram();
   if (shader_program->handle == 0)
@@ -91,17 +91,17 @@ int shader_program_init(ShaderProgram *shader_program)
   return 0;
 }
 
-void shader_program_attach(const ShaderProgram *shader_program, const Shader *shader)
+void gl_shader_program_attach(const GlShaderProgram *shader_program, const GlShader *shader)
 {
   glAttachShader(shader_program->handle, shader->handle);
 }
 
-void shader_program_bind(const ShaderProgram *shader_program)
+void gl_shader_program_bind(const GlShaderProgram *shader_program)
 {
   glUseProgram(shader_program->handle);
 }
 
-int shader_program_link(const ShaderProgram *shader_program)
+int gl_shader_program_link(const GlShaderProgram *shader_program)
 {
   glLinkProgram(shader_program->handle);
 
@@ -118,7 +118,7 @@ int shader_program_link(const ShaderProgram *shader_program)
   return 0;
 }
 
-void shader_program_destroy(ShaderProgram *shader_program)
+void gl_shader_program_destroy(GlShaderProgram *shader_program)
 {
   glDeleteProgram(shader_program->handle);
   shader_program->handle = 0;
