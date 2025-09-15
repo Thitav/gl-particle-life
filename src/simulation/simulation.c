@@ -78,39 +78,50 @@ void _simulation_gl_data_init(SimulationGlData *simulation_gl_data)
 {
   _simulation_shaders_init(simulation_gl_data);
   glCreateVertexArrays(1, &simulation_gl_data->vao);
-
   glCreateBuffers(1, &simulation_gl_data->simulation_ubo);
-  // glBindBuffer(GL_UNIFORM_BUFFER, simulation_ubo);
-  // glBufferData(GL_UNIFORM_BUFFER, sizeof(GLS_SimulationData), &simulation_data, GL_STATIC_DRAW);
-  // glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
   glCreateBuffers(1, &simulation_gl_data->particles_ssbo);
-  //  glNamedBufferData(particles_ssbo, (GLsizeiptr) (particles_count * sizeof(GLS_Particle)), simulation->particles,
-  // GL_STATIC_DRAW
-  // );
 }
 
-void simulation_init(Simulation *simulation, const SimulationGroups groups, const float viscosity,
-                     const unsigned int seed)
+void simulation_init(Simulation *simulation, SimulationParameters simulation_parameters)
 {
   simulation->last_time = 0.0f;
-  simulation->groups = groups;
-  simulation->gl_data.simulation_data.viscosity = viscosity;
-  // simulation->groups_count = groups_count;
-  // simulation->groups_sizes = groups_sizes;
-  _simulation_gl_data_init(&simulation->gl_data);
-  if (seed == 0)
+
+  simulation->gl_data.simulation_data.viscosity = simulation_parameters.viscosity;
+  if (simulation_parameters.seed == 0)
   {
     simulation->seed = time(NULL);
   }
   else
   {
-    simulation->seed = seed;
+    simulation->seed = simulation_parameters.seed;
   }
+
+  _simulation_gl_data_init(&simulation->gl_data);
+  _simulation_groups_init(&simulation->groups);
+}
+
+SimulationError simulation_add_group(Simulation *simulation, uint32_t group_size)
+{
+  return _simulation_groups_add_group(&simulation->groups, group_size);
+}
+
+SimulationError simulation_add_group_rules(Simulation *simulation, const uint8_t group_idx, const uint16_t rules_count,
+                                           const GLS_ParticleGroupRule *rules)
+{
+  return _simulation_groups_add_rules(&simulation->groups, group_idx, rules_count, rules);
 }
 
 SimulationError simulation_start(Simulation *simulation)
 {
+  if (simulation->groups.group_count == 0)
+  {
+    return E_SIM_NO_GROUPS;
+  }
+  if (!_simulation_groups_is_sealed(&simulation->groups))
+  {
+    return E_SIM_NO_RULES;
+  }
+
   srand(simulation->seed);
 
   simulation->gl_data.simulation_data.particles_count = simulation->groups.total_size;

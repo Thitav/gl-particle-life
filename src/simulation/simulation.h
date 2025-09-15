@@ -36,6 +36,12 @@ typedef struct
 
 typedef struct
 {
+  float viscosity;
+  unsigned int seed;
+} SimulationParameters;
+
+typedef struct
+{
   SimulationGlData gl_data;
   SimulationGroups groups;
   float last_time;

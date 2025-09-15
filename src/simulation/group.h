@@ -3,6 +3,19 @@
 
 #include <stdint.h>
 #include "error.h"
+#include <gl/types.h>
+#include <stdbool.h>
+
+#define SIMULATION_MAX_GROUPS 32
+#define SIMULATION_MAX_PARTICLES UINT32_MAX
+
+typedef struct
+{
+  GLfloat attraction;
+  GLfloat min_radius;
+  GLfloat max_radius;
+  GLfloat _pad;
+} GLS_ParticleGroupRule;
 
 typedef struct
 {
@@ -15,19 +28,22 @@ typedef struct
   uint32_t total_size;
   uint8_t group_count;
   ParticleGroup *groups;
-  float *rules;
+  GLS_ParticleGroupRule *rules;
 } SimulationGroups;
 
-void simulation_groups_init(SimulationGroups *simulation_groups);
+void _simulation_groups_init(SimulationGroups *simulation_groups);
 
-void simulation_groups_clear(SimulationGroups *simulation_groups);
+void _simulation_groups_clear(SimulationGroups *simulation_groups);
 
-SimulationError simulation_groups_add_group(SimulationGroups *simulation_groups, uint32_t group_size);
+bool _simulation_groups_is_sealed(const SimulationGroups *simulation_groups);
 
-SimulationError simulation_groups_add_rules(SimulationGroups *simulation_groups, uint8_t group_idx,
-                                            uint8_t rules_count,
-                                            const float *rules);
+ParticleGroup *_simulation_groups_get(const SimulationGroups *simulation_groups, uint8_t group_idx);
 
-ParticleGroup *simulation_groups_get(const SimulationGroups *simulation_groups, uint8_t group_idx);
+SimulationError _simulation_groups_add_group(SimulationGroups *simulation_groups, uint32_t group_size);
+
+SimulationError _simulation_groups_add_rules(SimulationGroups *simulation_groups, uint8_t group_idx,
+                                             uint16_t rules_count,
+                                             const GLS_ParticleGroupRule *rules);
+
 
 #endif
