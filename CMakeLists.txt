@@ -13,11 +13,7 @@ file (GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.c" "src/**/*.c" "src/*.h" "s
 
 add_subdirectory("lib/glfw" EXCLUDE_FROM_ALL)
 
-add_executable(gl-particles "lib/glad/src/gl.c " ${SOURCES}
-        src/simulation/group.c
-        src/simulation/group.h
-        src/simulation/error.h
-        src/gl/types.h)
+add_executable(gl-particles "lib/glad/src/gl.c" ${SOURCES})
 target_include_directories(gl-particles PRIVATE "src/" PUBLIC "lib/glad/include")
 target_link_libraries(gl-particles PRIVATE glfw)
 

@@ -1,0 +1,12 @@
+name: opengl-devenv
+
+services:
+  devenv:
+    build: .
+    tty: true
+    environment:
+      DISPLAY: ${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - $HOME/.Xauthority:/root/.Xauthority
+      - ..:/workspace:cached

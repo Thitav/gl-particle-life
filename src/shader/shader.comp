@@ -1,0 +1,54 @@
+#version 450 core
+
+layout (local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+struct Particle {
+    vec2 position;
+    vec2 velocity;
+    uint type;
+};
+layout (std430, binding = 0) buffer particlesSSBO {
+    Particle particles[];
+};
+
+uniform float deltaTime;
+
+struct ParticleGroupRule {
+    float attraction;
+    float min_radius;
+    float max_radius;
+};
+layout (std140, binding = 1) uniform simulationUBO {
+    ParticleGroupRule groupsRules[32 * 32];
+    vec4 groupsColors[32];
+    uint particlesCount;
+    uint groupsCount;
+    float viscosity;
+};
+
+void main() {
+    Particle self = particles[gl_GlobalInvocationID.x];
+    vec2 force = vec2(0.0, 0.0);
+
+    // uint particleCount = gl_NumWorkGroups.x * gl_WorkGroupSize.x;
+    for (uint i = 0; i < particlesCount; i++) {
+        if (i == gl_GlobalInvocationID.x) {
+            continue;
+        }
+
+        Particle p = particles[i];
+        ParticleGroupRule rule = groupsRules[self.type * 32 + p.type];
+
+        vec2 diff = self.position - p.position;
+        float dist = length(diff);
+        if (dist < rule.min_radius || dist > rule.max_radius) {
+            continue;
+        }
+        
+        force += diff * 0.01f * rule.attraction / dist;
+    }
+    self.velocity *= 1.0f - viscosity;
+    self.velocity += force * deltaTime;
+
+    particles[gl_GlobalInvocationID.x] = self;
+}
