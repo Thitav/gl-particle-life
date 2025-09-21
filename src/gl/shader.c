@@ -1,5 +1,5 @@
 #include "shader.h"
-#include "gl/glh.h"
+#include "glh.h"
 #include <stdio.h>
 
 int gl_shader_init(GlShader *shader, GLenum type) {

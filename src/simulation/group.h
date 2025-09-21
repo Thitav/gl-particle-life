@@ -1,8 +1,8 @@
 #ifndef SIMULATION_GROUP_H
 #define SIMULATION_GROUP_H
 
-#include "error.h"
-#include <gl/types.h>
+#include "../error.h"
+#include "../gl/types.h"
 #include <stdbool.h>
 #include <stdint.h>
 

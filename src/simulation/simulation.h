@@ -1,9 +1,10 @@
 #ifndef SIMULATION_SIMULATION_H
 #define SIMULATION_SIMULATION_H
 
+#include "../gl/shader.h"
+#include "../gl/types.h"
 #include "group.h"
-#include <gl/shader.h>
-#include <gl/types.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef struct {
@@ -11,7 +12,15 @@ typedef struct {
     GLS_Vec2 velocity;
     GLuint type;
     GLfloat _pad;
-} GLS_Particle;
+} GLS_Particle2d;
+
+typedef struct {
+    GLS_Vec3 position;
+    GLfloat _pad;
+    GLS_Vec3 velocity;
+    GLuint type;
+    // GLfloat _pad[3];
+} GLS_Particle3d;
 
 typedef struct {
     GLS_ParticleGroupRule groups_rules[SIMULATION_MAX_GROUPS * SIMULATION_MAX_GROUPS];
@@ -34,6 +43,7 @@ typedef struct {
 
 typedef struct {
     float viscosity;
+    bool mode_3d;
     unsigned int seed;
 } SimulationParameters;
 

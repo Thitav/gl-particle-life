@@ -2,30 +2,24 @@
 #include <stdlib.h>
 
 #include "gl/gl.h"
-#include "gl/glh.h"
-#include "gl/types.h"
-#include "simulation.h"
+#include "simulation/simulation.h"
 #include <time.h>
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
-
-// Window resize callback function
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    glViewport(0, 0, width, height);
-}
 
 int main() {
     GlState gl_state;
     gl_init(&gl_state, SCREEN_WIDTH, SCREEN_HEIGHT, "Simulation", NULL);
 
     Simulation simulation;
-    simulation_init(&simulation, (SimulationParameters){.seed = time(NULL), .viscosity = 0.5f});
+    simulation_init(&simulation,
+                    (SimulationParameters){.seed = time(NULL), .viscosity = 1.0f, .mode_3d = true});
 
-    simulation_add_group(&simulation, 256 * 2);
-    simulation_add_group(&simulation, 256 * 2);
-    simulation_add_group(&simulation, 256 * 2);
-    simulation_add_group(&simulation, 256 * 2);
+    simulation_add_group(&simulation, 1024 * 2);
+    simulation_add_group(&simulation, 1024 * 2);
+    simulation_add_group(&simulation, 1024 * 2);
+    simulation_add_group(&simulation, 1024 * 2);
     // simulation_add_group(&simulation, 500);
     // simulation_add_group(&simulation, 500);
     // simulation_add_group(&simulation, 500);
@@ -45,7 +39,10 @@ int main() {
     simulation_start(&simulation);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_PROGRAM_POINT_SIZE);
+
     // glPointSize(2.0f);
 
     while (!glfwWindowShouldClose(gl_state.window)) {

@@ -1,7 +1,4 @@
 #include "group.h"
-#include "error.h"
-#include <gl/types.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
